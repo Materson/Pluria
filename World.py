@@ -5,7 +5,7 @@ from random import randint as rd
 
 
 class World:
-    def __init__(self, width, height, menu=0):
+    def __init__(self, width, height, menu=None):
         self.play = True
         self.menu = menu
         self.width = width
@@ -61,6 +61,7 @@ class World:
         return self.width
 
     def nextTurn(self, dx=1, dy=0):
+        # TODO repair do move if is new organism
         for i in range(7,-1,-1):
             if len(self.order[i]) == 0:
                 continue
@@ -244,7 +245,7 @@ class World:
         self.comment_i += 1
         self.comment_i = self.comment_i % (self.COMMENTS_AMOUNT)
         self.comments[self.comment_i] = "*********************************"
-        # self.menu.addComment(org1 + " " + action + " " + org2)
+        self.menu.addComment(org1 + " " + action + " " + org2)
 
     def printComments(self):
         for i in range(0, self.COMMENTS_AMOUNT):

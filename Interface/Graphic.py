@@ -1,11 +1,12 @@
 from PyQt5.QtWidgets import QWidget, QPushButton, QDesktopWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QScrollArea, QLineEdit, QLabel, QTextEdit
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtCore import Qt
-
+from World import World
 
 class Graphic(QWidget):
     def __init__(self):
         super().__init__()
+        self.minBtnSize = 30
         self.initUI()
 
     def initUI(self):
@@ -76,33 +77,6 @@ class Graphic(QWidget):
         self.height = int(height)
         self.width = int(width)
 
-        # remove old and create new map
-        self.mapWidget.setParent(None)
-        self.mapWidget = QWidget(self.left)
-        self.mapLayout = QGridLayout()
-        self.mapLayout.setSpacing(0)
-        self.mapLayout.setContentsMargins(0,0,0,0)
-        self.mapWidget.setLayout(self.mapLayout)
-
-        buttons = []
-        for i in range(self.width):
-            row = []
-            for j in range(self.height):
-                row.append(None)
-            buttons.append(row)
-
-        for i in range(self.height):
-            for j in range(self.width):
-                btn = QPushButton("Przycisk(" + str(j) + "," + str(i) + ")")
-                btn.setFlat(False)
-                btn.setFixedWidth(700 / self.width)
-                btn.setFixedHeight(600 / self.height)
-                btn.setMinimumHeight(60)
-                btn.setMinimumWidth(60)
-                self.mapLayout.addWidget(btn, i, j)
-                buttons[j][i] = btn
-        self.left.setWidget(self.mapWidget)
-
         # remove old widget and add new place
         self.menuWidget.setParent(None)
         self.menuWidget = QWidget()
@@ -143,10 +117,83 @@ class Graphic(QWidget):
         # comments area
         self.commentsArea = QTextEdit()
         self.commentsArea.setReadOnly(True)
-        self.commentsArea.setLineWrapMode(QTextEdit.NoWrap)
-        self.commentsArea.moveCursor(QTextCursor.End)
+        # self.commentsArea.setLineWrapMode(QTextEdit.NoWrap)
+        # self.commentsArea.moveCursor(QTextCursor.End)
+        # sb = self.commentsArea.verticalScrollBar()
+        # sb.setValue(sb.maximum())
+        self.commentsArea.textChanged.connect(self.moveTextArea)
+        font = self.commentsArea.font()
+        font.setFamily("Lucida Console")
+        font.setPointSize(12)
+        self.commentsArea.setFont(font)
         self.menuLayout.addWidget(self.commentsArea)
+
+        # remove old and create new map
+        self.mapWidget.setParent(None)
+        self.mapWidget = QWidget(self.left)
+        self.mapLayout = QGridLayout()
+        self.mapLayout.setSpacing(0)
+        self.mapLayout.setContentsMargins(0, 0, 0, 0)
+        self.mapWidget.setLayout(self.mapLayout)
+
+        self.map = World(self.width, self.height, self)
+        self.buttons = []
+        for i in range(self.width):
+            row = []
+            for j in range(self.height):
+                row.append(None)
+            self.buttons.append(row)
+
+        human = None
+        for i in range(self.height):
+            for j in range(self.width):
+                text = self.map.checkPlace(j, i)
+                btn = QPushButton(text)
+                btn.setFlat(False)
+                btn.setFixedWidth(700 / self.width)
+                btn.setFixedHeight(600 / self.height)
+                btn.setMinimumHeight(self.minBtnSize)
+                btn.setMinimumWidth(self.minBtnSize)
+                self.mapLayout.addWidget(btn, i, j)
+                self.buttons[j][i] = btn
+                if text == "H" or text == "O":
+                    self.buttons[j][i].setStyleSheet("background-color:#aa0")
+                    human = self.buttons[j][i]
+                else:
+                    self.buttons[j][i].setStyleSheet("background-color:#d")
+        self.left.setWidget(self.mapWidget)
+        vscroll = self.left.verticalScrollBar()
+        hscroll = self.left.horizontalScrollBar()
+        vscroll.setValue(human.y() - self.left.height() / 2)
+        hscroll.setValue(human.x() - self.left.width() / 2)
 
     def buttonHandler(self):
         # TODO implement this function
-        pass
+        text = self.sender().text()
+        if text == "Nastepna tura":
+            self.map.nextTurn()
+            self.refreshMap()
+
+        print("button Handler")
+
+
+    def addComment(self, text):
+        self.commentsArea.insertPlainText(text+"\n")
+
+    def moveTextArea(self):
+        self.commentsArea.moveCursor(QTextCursor.End)
+        self.commentsArea.ensureCursorVisible()
+
+    def refreshMap(self):
+        for i in range(self.height):
+            for j in range(self.width):
+                text = self.map.checkPlace(j, i)
+                self.buttons[j][i].setText(text)
+                if text == "H" or text == "O":
+                    self.buttons[j][i].setStyleSheet("background-color:#aa0")
+                    vscroll = self.left.verticalScrollBar()
+                    hscroll = self.left.horizontalScrollBar()
+                    vscroll.setValue(self.buttons[j][i].y() - self.left.height()/2)
+                    hscroll.setValue(self.buttons[j][i].x() - self.left.width()/2)
+                else:
+                    self.buttons[j][i].setStyleSheet("background-color:#d")
