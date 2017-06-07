@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QPushButton, QDesktopWidget, QGridLayout, QVBoxLayout, QHBoxLayout,QBoxLayout, QScrollArea, QLineEdit, QLabel
+from PyQt5.QtWidgets import QWidget, QPushButton, QDesktopWidget, QGridLayout, QVBoxLayout, QHBoxLayout,QBoxLayout, QScrollArea, QLineEdit, QLabel, QSpacerItem, QWidgetItem
 from PyQt5.QtCore import Qt
 
 
@@ -60,22 +60,67 @@ class Graphic(QWidget):
         self.move(qr.topLeft())
 
     def initRight(self):
+        self.right = QWidget()
+        self.right.setStyleSheet("background-color: #9AF")
         self.rlayout = QVBoxLayout()
         self.rlayout.setAlignment(Qt.AlignTop)
-        self.right = QWidget()
         self.right.setLayout(self.rlayout)
         self.grid.addWidget(self.right, 0, 7, 1, 3)
-        self.right.setStyleSheet("background-color: #9AF")
+
+        self.sizeWidget = QWidget()
+        self.sizeLayout = QVBoxLayout()
+        self.sizeWidget.setLayout(self.sizeLayout)
+        self.rlayout.addWidget(self.sizeWidget)
 
         widthLabel = QLabel("Szerokosc")
-        inWidth = QLineEdit()
+        self.inWidth = QLineEdit()
         heightLabel = QLabel("Wysokosc")
-        inHeight = QLineEdit()
+        self.inHeight = QLineEdit()
         btn = QPushButton("Utwórz")
+        btn.clicked.connect(self.createMap)
 
-        self.rlayout.addWidget(widthLabel)
-        self.rlayout.addWidget(inWidth)
-        self.rlayout.addWidget(heightLabel)
-        self.rlayout.addWidget(inHeight)
-        self.rlayout.addWidget(btn)
+        self.sizeLayout.addWidget(widthLabel)
+        self.sizeLayout.addWidget(self.inWidth)
+        self.sizeLayout.addWidget(heightLabel)
+        self.sizeLayout.addWidget(self.inHeight)
+        self.sizeLayout.addWidget(btn)
 
+    def createMap(self):
+        width = self.inWidth.text()
+        height = self.inHeight.text()
+        try:
+            int(width)
+            int(height)
+        except ValueError:
+            return False
+        # remove old widget and add new place
+        self.height = height
+        self.width = width
+        self.sizeWidget.setParent(None)
+        self.menuWidget = QWidget()
+        self.menuLayout = QVBoxLayout()
+        self.menuWidget.setLayout(self.menuLayout)
+        self.rlayout.addWidget(self.menuWidget)
+
+        # add size widget
+        sizeWidget = QWidget()
+        sizeLayout = QHBoxLayout()
+        sizeWidget.setLayout(sizeLayout)
+        self.menuLayout.addWidget(sizeWidget)
+        widthLabel = QLabel("Szerokosc: "+self.width)
+        heightLabel = QLabel("Wysokosc: "+self.height)
+
+        sizeLayout.addWidget(widthLabel)
+        sizeLayout.addWidget(heightLabel)
+
+        #add buttons
+        buttonsWidget = QWidget()
+        buttonsLayout = QHBoxLayout()
+        buttonsWidget.setLayout(buttonsLayout)
+
+        nextTurnBtn = QPushButton("Nastepna tura")
+        nextTurnBtn.clicked().connect(self.buttonHandler)
+
+
+        def buttonHandler(self):
+            pass
