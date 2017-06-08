@@ -30,7 +30,7 @@ class World:
         for i in range(8):
             self.order.append([])
 
-        self.FILL_RATIO = 5
+        self.FILL_RATIO = 2
         self.fillWorld()
         self.drawWorld()
 
@@ -78,7 +78,8 @@ class World:
                 if isinstance(self.order[i][j], Human.Human):
                     self.order[i][j].action(dx, dy)
                 else:
-                    self.order[i][j].action()
+                    if self.order[i][j].getOld() > 1:
+                        self.order[i][j].action()
                 j += 1
 
         self.drawWorld()

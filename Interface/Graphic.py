@@ -176,6 +176,7 @@ class Graphic(QWidget):
             self.refreshMap()
 
         print("button Handler")
+        self.setFocus()
 
     def returnFocus(self):
         self.setFocus()
@@ -272,6 +273,9 @@ class Graphic(QWidget):
             self.refreshMap()
         elif e.key() == Qt.Key_Up:
             self.map.nextTurn(0, -1)
+            self.refreshMap()
+        elif e.key() == Qt.Key_Space:
+            self.map.nextTurn(1, 1)
             self.refreshMap()
         elif e.key() == Qt.Key_Return:
             print("enter")

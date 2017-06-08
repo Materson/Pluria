@@ -59,7 +59,7 @@ class Human (Animal):
         else:
             super().collision(attacker)
 
-    def fire(self, move_x, move_y):
+    def fire(self, move_x=0, move_y=0):
         self.world.addComment("H:", "BURN IT ALL!;", str(self.skill - 1) + " left")
         if move_x != 0 or move_y != 0:
             place = self.world.checkPlace(self.x + move_x, self.y + move_y)
