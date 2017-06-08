@@ -60,7 +60,7 @@ class World:
     def getWidth(self):
         return self.width
 
-    def nextTurn(self, dx=1, dy=0):
+    def nextTurn(self, dx=0, dy=0):
         # TODO repair do move if is new organism
         for i in range(7,-1,-1):
             if len(self.order[i]) == 0:

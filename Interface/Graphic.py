@@ -7,6 +7,8 @@ class Graphic(QWidget):
     def __init__(self):
         super().__init__()
         self.minBtnSize = 30
+        # self.widget.keyPressed.connect(self.keyPressEvent)
+        # self.keyPressEvent = self.keyHandler
         self.initUI()
 
     def initUI(self):
@@ -64,6 +66,7 @@ class Graphic(QWidget):
         self.menuLayout.addWidget(heightLabel)
         self.menuLayout.addWidget(self.inHeight)
         self.menuLayout.addWidget(btn)
+        self.inWidth.setFocus()
 
     def createMap(self, width = 0, height = 0):
         if width == 0 and height == 0:
@@ -76,6 +79,8 @@ class Graphic(QWidget):
                 return False
         self.height = int(height)
         self.width = int(width)
+        self.inWidth = None
+        self.inHeight = None
 
         # remove old widget and add new place
         self.menuWidget.setParent(None)
@@ -144,7 +149,6 @@ class Graphic(QWidget):
                 row.append(None)
             self.buttons.append(row)
 
-        human = None
         for i in range(self.height):
             for j in range(self.width):
                 text = self.map.checkPlace(j, i)
@@ -156,16 +160,10 @@ class Graphic(QWidget):
                 btn.setMinimumWidth(self.minBtnSize)
                 self.mapLayout.addWidget(btn, i, j)
                 self.buttons[j][i] = btn
-                if text == "H" or text == "O":
-                    self.buttons[j][i].setStyleSheet("background-color:#aa0")
-                    human = self.buttons[j][i]
-                else:
-                    self.buttons[j][i].setStyleSheet("background-color:#d")
         self.left.setWidget(self.mapWidget)
-        vscroll = self.left.verticalScrollBar()
-        hscroll = self.left.horizontalScrollBar()
-        vscroll.setValue(human.y() - self.left.height() / 2)
-        hscroll.setValue(human.x() - self.left.width() / 2)
+        self.refreshMap()
+
+        self.setFocus()
 
     def buttonHandler(self):
         # TODO implement this function
@@ -197,3 +195,26 @@ class Graphic(QWidget):
                     hscroll.setValue(self.buttons[j][i].x() - self.left.width()/2)
                 else:
                     self.buttons[j][i].setStyleSheet("background-color:#d")
+
+    def keyPressEvent(self, e):
+
+        print("key press event")
+        if e.key() == Qt.Key_Left:
+            self.map.nextTurn(-1, 0)
+            self.refreshMap()
+        elif e.key() == Qt.Key_Down:
+            self.map.nextTurn(0, 1)
+            self.refreshMap()
+        elif e.key() == Qt.Key_Right:
+            self.map.nextTurn(1, 0)
+            self.refreshMap()
+        elif e.key() == Qt.Key_Up:
+            self.map.nextTurn(0, -1)
+            self.refreshMap()
+        elif e.key() == Qt.Key_Return:
+            print("enter")
+            if (self.inHeight is not None) and (self.inWidth is not None):
+                self.createMap()
+        elif e.key() == Qt.Key_Escape:
+            self.close()
+
