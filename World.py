@@ -5,15 +5,18 @@ from random import randint as rd
 
 
 class World:
-    def __init__(self, width, height, menu=None):
+    def __init__(self, width, height, fill, menu=None):
         self.play = True
         self.menu = menu
         self.width = width
         self.height = height
         self.orgNum = 0
         self.human = False
+        self.borschtCount = 0
         self.menu = menu
         self.map =  []
+        self.dx = [0, 1, 1, 1, 0, -1, -1, -1]
+        self.dy = [-1, -1, 0, 1, 1, 1, 0, -1]
         for i in range(0, self.width):
             row = []
             for j in range(0, self.height):
@@ -30,7 +33,7 @@ class World:
         for i in range(8):
             self.order.append([])
 
-        self.FILL_RATIO = 2
+        self.FILL_RATIO = fill
         self.fillWorld()
         self.drawWorld()
 
@@ -60,8 +63,16 @@ class World:
     def getWidth(self):
         return self.width
 
+    def getDx(self):
+        return self.dx
+
+    def getDy(self):
+        return self.dy
+
+    def getBorschtCount(self):
+        return self.borschtCount
+
     def nextTurn(self, dx=0, dy=0):
-        # TODO repair do move if is new organism
         for i in range(7,-1,-1):
             if len(self.order[i]) == 0:
                 continue
@@ -139,11 +150,14 @@ class World:
         return rd(mini, maxi-1)
 
     def addOrganism(self, image, x, y):
-        if image ==  'w':
+        if image == 'w':
             self.map[x][y] = Wolf.Wolf(9, 5, self, x, y)
             self.order[5].append(self.map[x][y])
         elif image == 's':
             self.map[x][y] = Sheep.Sheep(4, 4, self, x, y)
+            self.order[4].append(self.map[x][y])
+        elif image == 'C':
+            self.map[x][y] = CyberSheep.CyberSheep(11, 4, self, x, y)
             self.order[4].append(self.map[x][y])
         elif image == 'f':
             self.map[x][y] = Fox.Fox(3, 7, self, x, y)
@@ -173,13 +187,14 @@ class World:
         elif image == 'X':
             self.map[x][y] = Borscht.Borscht(10, self, x, y)
             self.order[0].append(self.map[x][y])
+            self.borschtCount += 1
         else:
             self.map[x][y] = None
             self.orgNum -= 1
         self.orgNum += 1
 
     def fillWorld(self):
-        organism = "abXHfgGmstw"
+        organism = "abXHfgGCmstw"
         h_x = -1
         h_y = -1
         for i in range(0,len(organism)):
@@ -213,6 +228,8 @@ class World:
         activity = org.getActivity()
         for i in range(0, len(self.order[activity])):
             if self.order[activity][i] == org:
+                if self.order[activity][i].getImage() == "X":
+                    self.borschtCount -= 1
                 del self.order[activity][i]
                 break
         self.orgNum -= 1
@@ -264,7 +281,15 @@ class World:
 
             for j in range(0, len(self.order[i])):
                 org = self.order[i][j]
-                text += org.getImage() + " " + str(org.getX()) + " " + str(org.getY()) + " " + str(org.getPower()) + " " + str(org.getOld()) + " "
+                image = org.getImage()
+                if image == "s'":
+                    image = "C"
+                x = str(org.getX())
+                y = str(org.getY())
+                power = str(org.getPower())
+                old = str(org.getOld())
+
+                text += image + " " + x + " " + y + " " + power + " " + old + " "
                 if isinstance(org, Human.Human):
                     text += str(org.getSkill()) + " "
         return text

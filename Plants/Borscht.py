@@ -12,10 +12,13 @@ class Borscht (Plant):
 
         for i in range(len(dx)):
             place = self.world.checkPlace(self.x + dx[i], self.y + dy[i])
-            if place != ' ' and place != '!' and self.world.checkOrganismActivity(self.x + dx[i], self.y + dy[i]) > 0:
+            if place != ' ' and place != '!' and self.world.checkOrganismActivity(self.x + dx[i], self.y + dy[i]) > 0 and place != "C" and place != "s'":
                 self.world.addComment(self.image, "poisoned", place)
                 self.world.delOrganism(None, self.x + dx[i], self.y + dy[i])
 
     def collision(self, attacker):
-        self.world.addComment(self.image, "poisoned", attacker.getImage())
-        self.world.delOrganism(attacker)
+        if attacker.getImage() != "C":
+            self.world.addComment(self.image, "poisoned", attacker.getImage())
+            self.world.delOrganism(attacker)
+        else:
+            super().collision(attacker)

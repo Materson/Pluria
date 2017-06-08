@@ -16,6 +16,8 @@ class Animal(Organism):
         if move_dx == 0 and move_dy == 0:
                 pos = Position()
                 self.randMove(pos, 1)
+                move_dx = pos.x
+                move_dy = pos.y
         if self.world.checkPlace(self.x + move_dx, self.y + move_dy) != '!':
             if self.world.checkPlace(self.x + move_dx, self.y + move_dy) == ' ':
                 self.world.moveOrganism(self, self.x + move_dx, self.y + move_dy)

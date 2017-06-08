@@ -58,6 +58,8 @@ class Graphic(QWidget):
         self.inWidth = QLineEdit()
         heightLabel = QLabel("Wysokosc")
         self.inHeight = QLineEdit()
+        fillLabel = QLabel("Wspolczynnik wypelnienia")
+        self.inFill = QLineEdit()
         btn = QPushButton("Utwórz")
         btn.clicked.connect(self.createMap)
 
@@ -65,6 +67,8 @@ class Graphic(QWidget):
         self.menuLayout.addWidget(self.inWidth)
         self.menuLayout.addWidget(heightLabel)
         self.menuLayout.addWidget(self.inHeight)
+        self.menuLayout.addWidget(fillLabel)
+        self.menuLayout.addWidget(self.inFill)
         self.menuLayout.addWidget(btn)
         self.inWidth.setFocus()
 
@@ -83,8 +87,9 @@ class Graphic(QWidget):
         if width == 0 and height == 0:
             width = self.inWidth.text()
             height = self.inHeight.text()
+            fill = self.inFill.text()
             try:
-                self.map = World(int(width), int(height), self)
+                self.map = World(int(width), int(height), int(fill), self)
             except ValueError:
                 return False
         self.height = int(height)
@@ -167,7 +172,6 @@ class Graphic(QWidget):
         self.setFocus()
 
     def buttonHandler(self):
-        # TODO implement save and load
         text = self.sender().text()
         if text == "Nastepna tura":
             self.map.nextTurn()
@@ -199,6 +203,7 @@ class Graphic(QWidget):
         antelope = menu.addAction("Antelope")
         berry = menu.addAction("Berry")
         borscht = menu.addAction("Borscht")
+        cyberSheep = menu.addAction("CyberSheep")
         fox = menu.addAction("Fox")
         grass = menu.addAction("Grass")
         guarana = menu.addAction("Guarana")
@@ -222,6 +227,8 @@ class Graphic(QWidget):
             self.map.addOrganism("b", x, y)
         elif action == borscht:
             self.map.addOrganism("X", x, y)
+        elif action == cyberSheep:
+            self.map.addOrganism("C", x, y)
         elif action == fox:
             self.map.addOrganism("f", x, y)
         elif action == grass:
