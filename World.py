@@ -156,6 +156,7 @@ class World:
         elif image == 'H':
             self.map[x][y] = Human.Human(5, 5, self, x, y)
             self.order[5].append(self.map[x][y])
+            self.human = True
         elif image == 'g':
             self.map[x][y] = Grass.Grass(0, self, x, y)
             self.order[0].append(self.map[x][y])

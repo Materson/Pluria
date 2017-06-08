@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QPushButton, QDesktopWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QScrollArea, QLineEdit, QLabel, QTextEdit
+from PyQt5.QtWidgets import QWidget, QPushButton, QDesktopWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QScrollArea, QLineEdit, QLabel, QTextEdit, QMenu
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtCore import Qt
 from World import World
@@ -158,6 +158,9 @@ class Graphic(QWidget):
                 btn.setFixedHeight(600 / self.height)
                 btn.setMinimumHeight(self.minBtnSize)
                 btn.setMinimumWidth(self.minBtnSize)
+                btn.setContextMenuPolicy(Qt.CustomContextMenu)
+                btn.customContextMenuRequested.connect(self.contextMenu)
+                btn.clicked.connect(self.returnFocus)
                 self.mapLayout.addWidget(btn, i, j)
                 self.buttons[j][i] = btn
         self.left.setWidget(self.mapWidget)
@@ -166,7 +169,7 @@ class Graphic(QWidget):
         self.setFocus()
 
     def buttonHandler(self):
-        # TODO implement this function
+        # TODO implement save and load
         text = self.sender().text()
         if text == "Nastepna tura":
             self.map.nextTurn()
@@ -174,6 +177,65 @@ class Graphic(QWidget):
 
         print("button Handler")
 
+    def returnFocus(self):
+        self.setFocus()
+
+    def contextMenu(self):
+        self.setFocus()
+        btn = self.sender()
+        if btn.text() != " ":
+            print("nie puste")
+            return False
+        idx = self.mapLayout.indexOf(btn)
+        location = self.mapLayout.getItemPosition(idx)
+        x = location[1]
+        y = location[0]
+
+        menu = QMenu(self)
+        antelope = menu.addAction("Antelope")
+        berry = menu.addAction("Berry")
+        borscht = menu.addAction("Borscht")
+        fox = menu.addAction("Fox")
+        grass = menu.addAction("Grass")
+        guarana = menu.addAction("Guarana")
+        human = False
+        if self.map.humanAlive() == False:
+            human = menu.addAction("Human")
+        milk = menu.addAction("Milk")
+        turtle = menu.addAction("Turtle")
+        sheep = menu.addAction("Sheep")
+        wolf = menu.addAction("Wolf")
+
+        vscroll = self.left.verticalScrollBar()
+        hscroll = self.left.horizontalScrollBar()
+        pos = btn.pos()
+        pos.setX(pos.x() - hscroll.value())
+        pos.setY(pos.y() - vscroll.value())
+        action = menu.exec_(self.mapToGlobal(pos))
+        if action == antelope:
+            self.map.addOrganism("a", x, y)
+        elif action == berry:
+            self.map.addOrganism("b", x, y)
+        elif action == borscht:
+            self.map.addOrganism("X", x, y)
+        elif action == fox:
+            self.map.addOrganism("f", x, y)
+        elif action == grass:
+            self.map.addOrganism("g", x, y)
+        elif action == guarana:
+            self.map.addOrganism("G", x, y)
+        elif action == human:
+            self.map.addOrganism("H", x, y)
+        elif action == milk:
+            self.map.addOrganism("m", x, y)
+        elif action == turtle:
+            self.map.addOrganism("t", x, y)
+        elif action == sheep:
+            self.map.addOrganism("s", x, y)
+        elif action == wolf:
+            self.map.addOrganism("w", x, y)
+
+        self.refreshMap()
 
     def addComment(self, text):
         self.commentsArea.insertPlainText(text+"\n")
@@ -218,3 +280,10 @@ class Graphic(QWidget):
         elif e.key() == Qt.Key_Escape:
             self.close()
 
+            # def contextMenuEvent(self, e):
+            #     menu = QMenu(self)
+            #     quitAction = menu.addAction("Quit")
+            #     action = menu.exec_(self.mapToGlobal(e.pos()))
+            #     print(e.sender().text())
+            #     if action == quitAction:
+            #         self.close()
