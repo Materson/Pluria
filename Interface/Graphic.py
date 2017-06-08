@@ -69,12 +69,22 @@ class Graphic(QWidget):
         self.inWidth.setFocus()
 
     def createMap(self, width = 0, height = 0):
+        # comments area
+        self.commentsArea = QTextEdit()
+        self.commentsArea.setReadOnly(True)
+        self.commentsArea.textChanged.connect(self.moveTextArea)
+        font = self.commentsArea.font()
+        font.setFamily("Lucida Console")
+        font.setPointSize(12)
+        self.commentsArea.setFont(font)
+        # add to layout at down cause must be good order
+
+        # check if create map from input user or from file
         if width == 0 and height == 0:
             width = self.inWidth.text()
             height = self.inHeight.text()
             try:
-                int(width)
-                int(height)
+                self.map = World(int(width), int(height), self)
             except ValueError:
                 return False
         self.height = int(height)
@@ -119,18 +129,7 @@ class Graphic(QWidget):
         buttonsLayout.addWidget(saveBtn)
         buttonsLayout.addWidget(loadBtn)
 
-        # comments area
-        self.commentsArea = QTextEdit()
-        self.commentsArea.setReadOnly(True)
-        # self.commentsArea.setLineWrapMode(QTextEdit.NoWrap)
-        # self.commentsArea.moveCursor(QTextCursor.End)
-        # sb = self.commentsArea.verticalScrollBar()
-        # sb.setValue(sb.maximum())
-        self.commentsArea.textChanged.connect(self.moveTextArea)
-        font = self.commentsArea.font()
-        font.setFamily("Lucida Console")
-        font.setPointSize(12)
-        self.commentsArea.setFont(font)
+
         self.menuLayout.addWidget(self.commentsArea)
 
         # remove old and create new map
@@ -141,7 +140,6 @@ class Graphic(QWidget):
         self.mapLayout.setContentsMargins(0, 0, 0, 0)
         self.mapWidget.setLayout(self.mapLayout)
 
-        self.map = World(self.width, self.height, self)
         self.buttons = []
         for i in range(self.width):
             row = []
@@ -174,6 +172,11 @@ class Graphic(QWidget):
         if text == "Nastepna tura":
             self.map.nextTurn()
             self.refreshMap()
+        elif text == "Zapisz":
+            self.map.saveFile()
+        elif text == "Wczytaj":
+            self.map.loadFile()
+            self.createMap(self.map.getWidth(), self.map.getHeight())
 
         print("button Handler")
         self.setFocus()
@@ -260,7 +263,7 @@ class Graphic(QWidget):
                     self.buttons[j][i].setStyleSheet("background-color:#d")
 
     def keyPressEvent(self, e):
-
+        # TODO add handler for s - save, l - load, n - nextTurn
         print("key press event")
         if e.key() == Qt.Key_Left:
             self.map.nextTurn(-1, 0)
@@ -283,11 +286,3 @@ class Graphic(QWidget):
                 self.createMap()
         elif e.key() == Qt.Key_Escape:
             self.close()
-
-            # def contextMenuEvent(self, e):
-            #     menu = QMenu(self)
-            #     quitAction = menu.addAction("Quit")
-            #     action = menu.exec_(self.mapToGlobal(e.pos()))
-            #     print(e.sender().text())
-            #     if action == quitAction:
-            #         self.close()

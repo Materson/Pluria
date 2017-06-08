@@ -255,8 +255,8 @@ class World:
                 print(self.comments[i])
 
     def prepareSave(self):
-        text = None
-        text += self.width + " " + self.height + " " + str(self.orgNum) + " "
+        text = ""
+        text += str(self.width) + " " + str(self.height) + " " + str(self.orgNum) + " "
 
         for i in range(7, -1, -1):
             if len(self.order[i]) == 0:
@@ -264,46 +264,29 @@ class World:
 
             for j in range(0, len(self.order[i])):
                 org = self.order[i][j]
-                text += org.getImage() + " " + org.getX() + " " + org.getY() + " " + org.getPower() + " " + org.getOld() + " "
+                text += org.getImage() + " " + str(org.getX()) + " " + str(org.getY()) + " " + str(org.getPower()) + " " + str(org.getOld()) + " "
                 if isinstance(org, Human.Human):
-                    text += org.getSkill() + " "
+                    text += str(org.getSkill()) + " "
         return text
 
-    # def
-    # void
-    # saveFile()
-    # {
-    # try{
-    # PrintWriter file = new PrintWriter("save.txt");
-    # file.println(prepareSave());
-    # file.close();
-    #
-    # } catch(IOException e)
-    # {
-    # //
-    # break;
-    # }
-    # }
+    def saveFile(self):
+        try:
+            file = open("save.txt", "w")
+            file.write(self.prepareSave())
+            file.close()
+            print("Save file")
+        except IOError:
+            return 0
 
-    # def
-    # void
-    # loadFile()
-    # throws
-    # FileNotFoundException
-    # {
-    #     String
-    # text = "";
-    # try{
-    # Scanner file = new Scanner(new File("save.txt"));
-    # text = file.nextLine();
-    # load(text);
-    # file.close();
-    # } catch(IOException e)
-    # {
-    # //
-    # break;
-    # }
-    # }
+    def loadFile(self):
+        text = ""
+        try:
+            file = open("save.txt", "r")
+            text = file.readline()
+            file.close()
+            self.load(text)
+        except IOError:
+            return 0
 
     def load(self, text):
         arr = text.split(" ")
@@ -350,3 +333,5 @@ class World:
                 self.map[x][y].setSkill(skill)
                 self.human = True
         self.orgNum = k
+        print("Load File")
+
